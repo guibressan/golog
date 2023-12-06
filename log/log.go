@@ -20,8 +20,10 @@ const (
 
 var (
 	ErrInvalidLogLevel = errors.New("log: invalid log level")
+	ErrLogFatal = errors.New("log: error log FATAL")
 )
 
+// Log is the struct of the logger
 type Log struct {
 	fd io.Writer
 	level int8
@@ -29,6 +31,8 @@ type Log struct {
 
 type logUtil int
 
+// NewLog creates a new instance of Log
+// Returns error on invalid log level
 func NewLog(w io.Writer, lvl int8) (*Log, error) {
 	lu := logUtil(1)
 	valid := lu.isValid(lvl)
@@ -36,18 +40,71 @@ func NewLog(w io.Writer, lvl int8) (*Log, error) {
 	return &Log{ fd: w, level: lvl }, nil
 }
 
+// Fatal prints the fatal log and panics
 func (l *Log) Fatal(params ...interface{}) {
 	l.log(LOGFATAL, params...)
+	panic(ErrLogFatal)
 }
 
+// Fatalf prints the fatal log and panics
 func (l *Log) Fatalf(fmtstr string, params ...interface{}) {
 	l.logf(LOGFATAL, fmtstr, params...)
+}
+
+// Err prints the err log
+func (l *Log) Err(params ...interface{}) {
+	l.log(LOGERR, params...)
+}
+
+// Errf prints the err log
+func (l *Log) Errf(fmtstr string, params ...interface{}) {
+	l.logf(LOGERR, fmtstr, params...)
+}
+
+// Warn prints the warn log
+func (l *Log) Warn(params ...interface{}) {
+	l.log(LOGWARN, params...)
+}
+
+// Warnf prints the warn log
+func (l *Log) Warnf(fmtstr string, params ...interface{}) {
+	l.logf(LOGWARN, fmtstr, params...)
+}
+
+// Info prints the info log
+func (l *Log) Info(params ...interface{}) {
+	l.log(LOGINFO, params...)
+}
+
+// Infof prints the info log
+func (l *Log) Infof(fmtstr string, params ...interface{}) {
+	l.logf(LOGINFO, fmtstr, params...)
+}
+
+// Debug prints the debug log
+func (l *Log) Debug(params ...interface{}) {
+	l.log(LOGDEBUG, params...)
+}
+
+// Debugf prints the debug log
+func (l *Log) Debugf(fmtstr string, params ...interface{}) {
+	l.logf(LOGDEBUG, fmtstr, params...)
+}
+
+// Trace prints the trace log
+func (l *Log) Trace(params ...interface{}) {
+	l.log(LOGTRACE, params...)
+}
+
+// Tracef prints the trace log
+func (l *Log) Tracef(fmtstr string, params ...interface{}) {
+	l.logf(LOGTRACE, fmtstr, params...)
 }
 
 func (l *Log) log(lvl int8, params ...interface{}) {
 	toLog := l.toLog(lvl)
 	if !toLog { return }
-	msg := fmt.Sprint(params...)
+	msg := fmt.Sprintln(params...)
 	l.logWrite(lvl, msg)
 }
 
@@ -64,7 +121,7 @@ func (l *Log) logWrite(lvl int8, msg string) {
 		fmt.Fprintln(os.Stderr, "log: err getting caller")
 	}
 	log := fmt.Sprintf(
-		"%s |%s| %s:%d: %s\n",
+		"%s |%s| %s:%d: %s",
 		time.Now().Format(time.DateTime),
 		logUtil(0).lvlStr(lvl),
 		file,
