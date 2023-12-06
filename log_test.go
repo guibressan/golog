@@ -10,14 +10,14 @@ import (
 func TestCreate(t *testing.T){
 	w := bytes.NewBuffer([]byte{})
 
-	_, err := NewLog(w, LOGERR)
+	_, err := NewLog(WithWriter(w), WithLevel(LOGERR))
 
 	if err != nil { t.Fatal(err) }
 }
 
 func TestLogLevel(t *testing.T) {
 	w := bytes.NewBuffer([]byte{})
-	log, err := NewLog(w, LOGERR)
+	log, err := NewLog(WithWriter(w), WithLevel(LOGERR))
 	if err != nil { t.Fatal(err) }
 
 	res := log.toLog(LOGWARN)
@@ -32,7 +32,7 @@ func TestLogLevel(t *testing.T) {
 
 func TestLogWritesToBuffer(t *testing.T) {
 	w := bytes.NewBuffer([]byte{})
-	log, err := NewLog(w, LOGERR)
+	log, err := NewLog(WithWriter(w), WithLevel(LOGERR))
 	if err != nil { t.Fatal(err) }
 
 	str := "testing 12344321"
@@ -45,7 +45,7 @@ func TestLogWritesToBuffer(t *testing.T) {
 
 func TestLogFatalPanics(t *testing.T){
 	w := bytes.NewBuffer([]byte{})
-	log, err := NewLog(w, LOGERR)
+	log, err := NewLog(WithWriter(w), WithLevel(LOGERR))
 	if err != nil { t.Fatal(err) }
 	defer func() {
 		err := recover()

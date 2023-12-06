@@ -31,13 +31,34 @@ type Log struct {
 
 type logUtil int
 
+// function that changes logger configuration
+type CfgFunc func(*Log)
+
+// WithWriter sets the logging writer
+func WithWriter(writer io.Writer) CfgFunc {
+	return func(l *Log) {
+		l.fd = writer
+	}
+}
+
+// WithLevel sets the logging level
+func WithLevel(level int8) CfgFunc {
+	return func(l *Log) {
+		l.level = level
+	}
+}
+
 // NewLog creates a new instance of Log
 // Returns error on invalid log level
-func NewLog(w io.Writer, lvl int8) (*Log, error) {
-	lu := logUtil(1)
-	valid := lu.isValid(lvl)
+func NewLog(cfgFuncs ...CfgFunc) (*Log, error) {
+	lu := logUtil(0)
+	log := lu.defaultLog();
+	for _, f := range cfgFuncs {
+		f(log)
+	}
+	valid := lu.isValid(log.level)
 	if !valid { return nil, ErrInvalidLogLevel }
-	return &Log{ fd: w, level: lvl }, nil
+	return log, nil
 }
 
 // Fatal prints the fatal log and panics
@@ -145,6 +166,13 @@ func (l logUtil) isValid(lvl int8) bool {
 	return lvl >= LOGFATAL && lvl <= LOGTRACE
 }
 
+func (l logUtil) defaultLog() *Log {
+	return &Log{
+		fd: os.Stderr,
+		level: LOGINFO,
+	}
+}
+
 func (l logUtil) lvlStr(lvl int8) string {
 	switch lvl {
 	case LOGFATAL:
@@ -162,4 +190,3 @@ func (l logUtil) lvlStr(lvl int8) string {
 	}
 	return ""
 }
-
