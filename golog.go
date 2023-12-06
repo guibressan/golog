@@ -31,7 +31,7 @@ type Log struct {
 
 type logUtil int
 
-// function that changes logger configuration
+// CfgFunc is a function that changes logger configuration
 type CfgFunc func(*Log)
 
 // WithWriter sets the logging writer
