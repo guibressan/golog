@@ -3,7 +3,6 @@ package log
 import (
 	"bytes"
 	"errors"
-	"os"
 	"testing"
 )
 
