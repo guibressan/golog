@@ -3,6 +3,7 @@ package log
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -22,13 +23,27 @@ func TestLogLevel(t *testing.T) {
 	res := log.toLog(LOGWARN)
 	res1 := log.toLog(LOGERR)
 	res2 := log.toLog(LOGFATAL)
+	res3 := log.toLog(LOGTRACE + 1)
 
-	if res || !res1 || !res2 { 
-		t.Fatal("unexpected result:", res, res1, res2) 
+	if res || !res1 || !res2 || res3 { 
+		t.Fatal("unexpected result:", res, res1, res2, res3) 
 	}
 }
 
-func TestLog(t *testing.T){
+func TestLogWritesToBuffer(t *testing.T) {
+	w := bytes.NewBuffer([]byte{})
+	log, err := NewLog(w, LOGERR)
+	if err != nil { t.Fatal(err) }
+
+	str := "testing 12344321"
+	log.Err("testing 12344321")
+
+	if !strings.Contains(string(w.Bytes()), str) {
+		t.Fatal("unexpected buffer:", string(w.Bytes()))
+	}
+}
+
+func TestLogFatalPanics(t *testing.T){
 	w := bytes.NewBuffer([]byte{})
 	log, err := NewLog(w, LOGERR)
 	if err != nil { t.Fatal(err) }
