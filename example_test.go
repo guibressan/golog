@@ -10,7 +10,7 @@ import (
 func TestExampleLogDefault(t *testing.T) {
 	log, _ := golog.NewLog();
 
-	log.Info(1, " == ", 1)
+	log.Info(1, "==", 1)
 }
 
 func TestExampleLogWithConfig(t *testing.T) {
@@ -19,5 +19,5 @@ func TestExampleLogWithConfig(t *testing.T) {
 		golog.WithWriter(os.Stderr),
 	);
 
-	log.Info(1, " == ", 1)
+	log.Infof("1 == %d\n", 1)
 }
