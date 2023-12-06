@@ -36,7 +36,7 @@ func TestLogWritesToBuffer(t *testing.T) {
 	if err != nil { t.Fatal(err) }
 
 	str := "testing 12344321"
-	log.Err("testing 12344321")
+	log.Err(str)
 
 	if !strings.Contains(string(w.Bytes()), str) {
 		t.Fatal("unexpected buffer:", string(w.Bytes()))
