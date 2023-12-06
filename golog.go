@@ -70,6 +70,7 @@ func (l *Log) Fatal(params ...interface{}) {
 // Fatalf prints the fatal log and panics
 func (l *Log) Fatalf(fmtstr string, params ...interface{}) {
 	l.logf(LOGFATAL, fmtstr, params...)
+	panic(ErrLogFatal)
 }
 
 // Err prints the err log
