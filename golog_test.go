@@ -64,3 +64,25 @@ func TestLogFatalPanics(t *testing.T){
 	// expected panic
 	log.Fatal("testing log fatal")
 }
+
+func TestLogFatalFPanics(t *testing.T){
+	w := bytes.NewBuffer([]byte{})
+	log, err := NewLog(WithWriter(w), WithLevel(LOGERR))
+	if err != nil { t.Fatal(err) }
+	defer func() {
+		err := recover()
+		if err == nil {
+			t.Fatal("expecting panic")
+		} 
+		perror, ok := err.(error)
+		if !ok {
+			t.Fatal("unexpected panic:", err)
+		}
+		if !errors.Is(ErrLogFatal, perror) {
+			t.Fatal("unexpected error type:", err)
+		}
+	}()
+
+	// expected panic
+	log.Fatalf("testing log fatal")
+}
